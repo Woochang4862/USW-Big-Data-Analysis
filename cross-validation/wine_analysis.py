@@ -19,10 +19,16 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
 from scipy import stats
+import os
+from tqdm.auto import tqdm
+import argparse
+import json
+
+RESULTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'results')
 import warnings
 warnings.filterwarnings('ignore')
+# statannot 사용 (iris 분석 스타일)
 try:
-    # statannot는 수평 브래킷과 별표 표기를 위해 사용
     from statannot import add_stat_annotation
     _HAS_STATANNOT = True
 except Exception:
@@ -35,7 +41,13 @@ plt.rcParams['axes.unicode_minus'] = False
 def load_and_preprocess_data():
     """Wine 데이터 로드 및 전처리"""
     print("Wine 데이터 로드 중...")
-    df = pd.read_csv("../wine-classification-dacon/data/train.csv", index_col=None)
+    # 절대 경로 기준으로 데이터 파일을 안전하게 찾는다
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    data_path = os.path.abspath(os.path.join(base_dir, "../wine-classification-dacon/data/train.csv"))
+    if not os.path.exists(data_path):
+        # 워크스페이스 루트에서의 절대 경로도 시도
+        data_path = "/Users/jeong-uchang/USW-Big-Data-Analysis/wine-classification-dacon/data/train.csv"
+    df = pd.read_csv(data_path, index_col=None)
     
     print(f"데이터셋 크기: {df.shape}")
     print(f"클래스 분포:")
@@ -63,14 +75,14 @@ def load_and_preprocess_data():
 def get_classifiers():
     """8개 분류 알고리즘 정의"""
     classifiers = {
-        'LogisticRegression': LogisticRegression(random_state=42, max_iter=1000),
-        'DecisionTree': DecisionTreeClassifier(random_state=42),
-        'SVM': SVC(random_state=42),
+        'LogisticRegression': LogisticRegression(random_state=42, max_iter=2000, solver='lbfgs', multi_class='multinomial', C=2.0),
+        'DecisionTree': DecisionTreeClassifier(random_state=42, max_depth=20, min_samples_split=4, min_samples_leaf=2),
+        'SVM': SVC(random_state=42, kernel='rbf', C=5.0, gamma='scale'),
         'GaussianNB': GaussianNB(),
-        'KNN': KNeighborsClassifier(n_neighbors=5),
-        'RandomForest': RandomForestClassifier(random_state=42),
-        'GradientBoosting': GradientBoostingClassifier(random_state=42),
-        'NeuralNetwork': MLPClassifier(random_state=42, max_iter=1000)
+        'KNN': KNeighborsClassifier(n_neighbors=11, weights='distance', p=2),
+        'RandomForest': RandomForestClassifier(random_state=42, n_estimators=400, max_depth=None, min_samples_split=2, n_jobs=-1),
+        'GradientBoosting': GradientBoostingClassifier(random_state=42, n_estimators=300, learning_rate=0.05, max_depth=3, subsample=0.9),
+        'NeuralNetwork': MLPClassifier(random_state=42, max_iter=1000, hidden_layer_sizes=(128, 64), activation='relu', alpha=1e-4)
     }
     
     print("사용할 분류 알고리즘:")
@@ -86,9 +98,9 @@ def perform_5fold_cv(X, y, classifiers):
     skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
     cv_results = {}
     
-    for name, classifier in classifiers.items():
+    for name, classifier in tqdm(classifiers.items(), desc="[5-fold] Models", leave=False):
         scores = []
-        for train_idx, test_idx in skf.split(X, y):
+        for train_idx, test_idx in tqdm(skf.split(X, y), total=skf.get_n_splits(), desc=f"  {name}", leave=False):
             X_train, X_test = X[train_idx], X[test_idx]
             y_train, y_test = y[train_idx], y[test_idx]
             
@@ -110,9 +122,9 @@ def perform_shuffle_split_cv(X, y, classifiers):
     sss = StratifiedShuffleSplit(n_splits=40, test_size=0.5, random_state=42)
     cv_results = {}
     
-    for name, classifier in classifiers.items():
+    for name, classifier in tqdm(classifiers.items(), desc="[ShuffleSplit] Models", leave=False):
         scores = []
-        for train_idx, test_idx in sss.split(X, y):
+        for train_idx, test_idx in tqdm(sss.split(X, y), total=sss.get_n_splits(), desc=f"  {name}", leave=False):
             X_train, X_test = X[train_idx], X[test_idx]
             y_train, y_test = y[train_idx], y[test_idx]
             
@@ -141,7 +153,34 @@ def perform_statistical_tests(results_df, best_model_name):
     
     return p_values
 
-def create_barplot_with_significance(results_df, p_values, best_model, title, filename):
+def _draw_manual_brackets(ax, order, best_model, p_values, means, stds):
+    """수동 브래킷 그리기 (statannot 폴백)"""
+    def draw_bracket(ax_, x1, x2, y, h=0.012, text='*', fontsize=12):
+        xm = (x1 + x2) / 2
+        ax_.plot([x1, x1, x2, x2], [y, y + h, y + h, y], color='black', lw=1.5)
+        ax_.text(xm, y + h, text, ha='center', va='bottom', fontsize=fontsize, fontweight='bold')
+    
+    base_idx = order.index(best_model)
+    comparisons = []
+    for i, model in enumerate(order):
+        if model == best_model:
+            continue
+        p_val = p_values.get(model, None)
+        if p_val is None or p_val >= 0.05:
+            continue
+        sig = "***" if p_val < 0.001 else "**" if p_val < 0.01 else "*"
+        comparisons.append((abs(i - base_idx), i, sig))
+    
+    comparisons.sort(reverse=True)
+    data_max = max(means[m] + stds[m] for m in order)
+    y_start = data_max + 0.028
+    bracket_spacing = 0.024
+    
+    for level, (dist, i, sig) in enumerate(comparisons):
+        y = y_start + level * bracket_spacing
+        draw_bracket(ax, min(i, base_idx), max(i, base_idx), y, h=0.012, text=sig, fontsize=11)
+
+def create_barplot_with_significance(results_df, p_values, best_model, title, filename, show=False):
     """유의성을 *로 표기한 bar plot 생성 (statannot 스타일)"""
     means = results_df.mean()
     stds = results_df.std()
@@ -156,45 +195,50 @@ def create_barplot_with_significance(results_df, p_values, best_model, title, fi
     ax = sns.barplot(x='method', y='accuracy', data=df_long, order=order, capsize=.2,
                      ci='sd', palette='tab10')
 
-    # y축 범위는 데이터에 맞게 여유를 둔다
-    ymin = max(0.0, float(df_long['accuracy'].min()) - 0.02)
-    ymax = min(1.01, float(df_long['accuracy'].max()) + 0.03)
+    # y축 범위를 브래킷이 잘 보이도록 설정
+    ymin = max(0.0, float(df_long['accuracy'].min()) - 0.05)
+    ymax = 0.75  # 브래킷 공간 확보 (타이틀 겹침 방지)
     ax.set(ylim=(ymin, ymax))
     ax.set_xticklabels(ax.get_xticklabels(), rotation=30)
 
+    # statannot 사용 (iris 분석 스타일)
     if _HAS_STATANNOT:
-        # 최고 성능 모델과 나머지 모두를 비교하는 브래킷 생성
-        box_pairs = [(m, best_model) for m in order if m != best_model]
-        add_stat_annotation(
-            ax,
-            data=df_long,
-            x='method',
-            y='accuracy',
-            order=order,
-            box_pairs=box_pairs,
-            test='Wilcoxon',
-            text_format='star',
-            comparisons_correction=None,
-            loc='inside',
-            verbose=0
-        )
+        # 최고 성능 모델과 나머지 모든 모델 간 비교 쌍 생성
+        box_pairs = []
+        for model in order:
+            if model != best_model:
+                box_pairs.append((model, best_model))
+        
+        try:
+            add_stat_annotation(
+                ax, 
+                data=df_long, 
+                x='method', 
+                y='accuracy',
+                order=order,
+                box_pairs=box_pairs,
+                test='Wilcoxon', 
+                text_format='star', 
+                comparisons_correction=None,
+                loc='inside', 
+                verbose=2
+            )
+        except Exception as e:
+            print(f"statannot 오류 (수동 브래킷으로 폴백): {e}")
+            _draw_manual_brackets(ax, order, best_model, p_values, means, stds)
     else:
-        # statannot 미설치 시, 간단한 별표 텍스트만 표기
-        sorted_models = order
-        for i, model in enumerate(sorted_models):
-            if model != best_model and model in p_values:
-                p_val = p_values[model]
-                if p_val < 0.05:
-                    sig = "***" if p_val < 0.001 else "**" if p_val < 0.01 else "*"
-                    y = means[model] + stds[model] + 0.005
-                    ax.text(i, y, sig, ha='center', va='bottom', fontsize=12, fontweight='bold')
+        _draw_manual_brackets(ax, order, best_model, p_values, means, stds)
 
     plt.xlabel('Classification Algorithms', fontsize=12)
     plt.ylabel('Accuracy', fontsize=12)
     plt.title(title, fontsize=14, fontweight='bold')
     plt.tight_layout()
-    plt.savefig(f'figures/{filename}', dpi=300, bbox_inches='tight')
-    plt.show()
+    # 저장 경로 보장
+    out_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'figures')
+    os.makedirs(out_dir, exist_ok=True)
+    plt.savefig(os.path.join(out_dir, filename), dpi=300, bbox_inches='tight')
+    if show:
+        plt.show()
 
     return order, [means[m] for m in order]
 
@@ -204,19 +248,38 @@ def main():
     print("WINE 데이터셋 교차검증 및 통계 검정 분석")
     print("=" * 60)
     
-    # 1. 데이터 로드 및 전처리
-    X, y = load_and_preprocess_data()
-    
-    # 2. 분류 알고리즘 정의
-    classifiers = get_classifiers()
-    
-    # 3. 5-fold Cross Validation 수행
-    cv_5fold_results = perform_5fold_cv(X, y, classifiers)
-    results_5fold = pd.DataFrame(cv_5fold_results)
-    
-    # 4. Shuffle Split Cross Validation 수행
-    cv_shuffle_results = perform_shuffle_split_cv(X, y, classifiers)
-    results_shuffle = pd.DataFrame(cv_shuffle_results)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--plot-only', action='store_true', help='저장된 결과로만 그래프 생성')
+    args, _ = parser.parse_known_args()
+
+    os.makedirs(RESULTS_DIR, exist_ok=True)
+    cache_5 = os.path.join(RESULTS_DIR, 'results_5fold.json')
+    cache_s = os.path.join(RESULTS_DIR, 'results_shuffle.json')
+
+    if args.plot_only and os.path.exists(cache_5) and os.path.exists(cache_s):
+        print('저장된 결과를 불러와 그래프만 생성합니다...')
+        with open(cache_5, 'r') as f:
+            cv_5fold_results = json.load(f)
+        with open(cache_s, 'r') as f:
+            cv_shuffle_results = json.load(f)
+        results_5fold = pd.DataFrame(cv_5fold_results)
+        results_shuffle = pd.DataFrame(cv_shuffle_results)
+    else:
+        # 1. 데이터 로드 및 전처리
+        X, y = load_and_preprocess_data()
+        # 2. 분류 알고리즘 정의
+        classifiers = get_classifiers()
+        # 3. 5-fold Cross Validation 수행
+        cv_5fold_results = perform_5fold_cv(X, y, classifiers)
+        results_5fold = pd.DataFrame(cv_5fold_results)
+        # 4. Shuffle Split Cross Validation 수행
+        cv_shuffle_results = perform_shuffle_split_cv(X, y, classifiers)
+        results_shuffle = pd.DataFrame(cv_shuffle_results)
+        # 캐시 저장
+        with open(cache_5, 'w') as f:
+            json.dump(cv_5fold_results, f)
+        with open(cache_s, 'w') as f:
+            json.dump(cv_shuffle_results, f)
     
     # 5. 최고 성능 모델 찾기
     best_5fold = results_5fold.mean().idxmax()
@@ -246,14 +309,14 @@ def main():
     models_5fold, means_5fold = create_barplot_with_significance(
         results_5fold, p_values_5fold, best_5fold, 
         'Wine Dataset: 5-fold Cross Validation Results', 
-        'wine_5fold_barplot.png'
+        'wine_5fold_barplot.png', show=False
     )
     
     # Shuffle Split CV Bar plot
     models_shuffle, means_shuffle = create_barplot_with_significance(
         results_shuffle, p_values_shuffle, best_shuffle, 
         'Wine Dataset: Shuffle Split Cross Validation Results (40 iterations)', 
-        'wine_shuffle_split_barplot.png'
+        'wine_shuffle_split_barplot.png', show=False
     )
     
     # 8. 결과 요약
