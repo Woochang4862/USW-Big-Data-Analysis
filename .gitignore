@@ -234,7 +234,7 @@ time_left.tsv
 # .cursor/
 
 # Large result files (optional - uncomment if you don't want to commit large result files)
-# results/*.json
-# results/*.png
+**/results/*.json
+**/results/*.png
 
 data/
