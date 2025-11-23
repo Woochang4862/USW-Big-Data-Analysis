@@ -215,4 +215,26 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Virtual environments
+.venv*/
+venv*/
+
+# ML Training logs and artifacts
+catboost_info/
+**/catboost_info/
+*.tfevents
+learn_error.tsv
+time_left.tsv
+
+# Cursor IDE settings (optional - uncomment if you don't want to commit)
+# .cursor/
+
+# Large result files (optional - uncomment if you don't want to commit large result files)
+# results/*.json
+# results/*.png
+
 data/
