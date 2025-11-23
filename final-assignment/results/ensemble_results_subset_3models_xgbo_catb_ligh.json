@@ -1,0 +1,72 @@
+{
+  "best_models": {
+    "XGBoost": {
+      "config_name": "Level-3",
+      "params": {
+        "n_estimators": 20,
+        "max_depth": 3,
+        "learning_rate": 0.1
+      },
+      "test_score": 0.7412661350259631,
+      "test_f1": 0.7690244720080456,
+      "test_auroc": 0.7135077980438806,
+      "model_type_actual": "XGBoost"
+    },
+    "CatBoost": {
+      "config_name": "Level1",
+      "params": {
+        "iterations": 80,
+        "depth": 6,
+        "learning_rate": 0.1,
+        "l2_leaf_reg": 0.5,
+        "random_state": 42
+      },
+      "test_score": 0.7414948632196221,
+      "test_f1": 0.7639986259017519,
+      "test_auroc": 0.7189911005374923,
+      "model_type_actual": "CatBoost"
+    },
+    "LightGBM": {
+      "config_name": "Level-2",
+      "params": {
+        "n_estimators": 30,
+        "max_depth": 3,
+        "learning_rate": 0.1,
+        "num_leaves": 15,
+        "random_state": 42
+      },
+      "test_score": 0.7380040927914073,
+      "test_f1": 0.7646662171274443,
+      "test_auroc": 0.7113419684553705,
+      "model_type_actual": "LightGBM"
+    }
+  },
+  "individual_results": {
+    "XGBoost": {
+      "f1": 0.7700463883366467,
+      "auroc": 0.7120415895673627,
+      "score": 0.7410439889520047
+    },
+    "CatBoost": {
+      "f1": 0.7642220699108979,
+      "auroc": 0.7185998766411137,
+      "score": 0.7414109732760058
+    },
+    "LightGBM": {
+      "f1": 0.7646662171274443,
+      "auroc": 0.7113419684553705,
+      "score": 0.7380040927914073
+    }
+  },
+  "ensemble_result": {
+    "f1": 0.7682475613858056,
+    "auroc": 0.7175892149088026,
+    "score": 0.742918388147304
+  },
+  "ensemble_method": "weighted_average",
+  "weights": {
+    "XGBoost": 0.33424299595052637,
+    "CatBoost": 0.3344492986212772,
+    "LightGBM": 0.3313077054281965
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "best_models": {
+    "DecisionTree": {
+      "config_name": "Level2",
+      "params": {
+        "max_depth": 5,
+        "random_state": 42
+      },
+      "test_score": 0.6999651384553718,
+      "test_f1": 0.7339971550497866,
+      "test_auroc": 0.6659331218609569
+    },
+    "NeuralNetwork": {
+      "config_name": "Level4",
+      "params": {
+        "layers": [
+          512,
+          256,
+          128,
+          64
+        ],
+        "epochs": 200,
+        "random_state": 42
+      },
+      "test_score": 0.6831578090037274,
+      "test_f1": 0.7081593927893738,
+      "test_auroc": 0.6581562252180808
+    },
+    "LogisticRegression": {
+      "config_name": "Level8",
+      "params": {
+        "C": 0.01,
+        "random_state": 42
+      },
+      "test_score": 0.7345925807693228,
+      "test_f1": 0.7527414220021224,
+      "test_auroc": 0.7164437395365231
+    },
+    "RandomForest": {
+      "config_name": "Level4",
+      "params": {
+        "n_estimators": 200,
+        "max_depth": 15,
+        "random_state": 42
+      },
+      "test_score": 0.7305872092068143,
+      "test_f1": 0.7613559322033898,
+      "test_auroc": 0.6998184862102388
+    },
+    "XGBoost": {
+      "config_name": "Level-3",
+      "params": {
+        "n_estimators": 20,
+        "max_depth": 3,
+        "learning_rate": 0.1,
+        "random_state": 42
+      },
+      "test_score": 0.7412661350259631,
+      "test_f1": 0.7690244720080456,
+      "test_auroc": 0.7135077980438806
+    },
+    "LightGBM": {
+      "config_name": "Level-2",
+      "params": {
+        "n_estimators": 30,
+        "max_depth": 3,
+        "learning_rate": 0.1,
+        "num_leaves": 15,
+        "random_state": 42
+      },
+      "test_score": 0.7404987556189659,
+      "test_f1": 0.7666552784420909,
+      "test_auroc": 0.7143422327958411
+    }
+  },
+  "individual_results": {
+    "DecisionTree": {
+      "f1": 0.7339971550497866,
+      "auroc": 0.6659331218609569,
+      "score": 0.6999651384553718
+    },
+    "NeuralNetwork": {
+      "f1": 0.6854103343465046,
+      "auroc": 0.6391950832672483,
+      "score": 0.6623027088068765
+    },
+    "LogisticRegression": {
+      "f1": 0.7527414220021224,
+      "auroc": 0.7164437395365231,
+      "score": 0.7345925807693228
+    },
+    "RandomForest": {
+      "f1": 0.7613559322033898,
+      "auroc": 0.6998184862102388,
+      "score": 0.7305872092068143
+    },
+    "XGBoost": {
+      "f1": 0.7690244720080456,
+      "auroc": 0.7135077980438806,
+      "score": 0.7412661350259631
+    },
+    "LightGBM": {
+      "f1": 0.7666552784420909,
+      "auroc": 0.7143422327958411,
+      "score": 0.7404987556189659
+    }
+  },
+  "ensemble_result": {
+    "f1": 0.7579240682688958,
+    "auroc": 0.7140576262225746,
+    "score": 0.7359908472457353
+  },
+  "ensemble_method": "weighted_average",
+  "weights": {
+    "DecisionTree": 0.15664134470667154,
+    "NeuralNetwork": 0.14920921840839174,
+    "LogisticRegression": 0.17252286312448714,
+    "RandomForest": 0.1706466277880513,
+    "XGBoost": 0.17567173914375395,
+    "LightGBM": 0.17530820682864434
+  }
+}

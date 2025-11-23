@@ -1,0 +1,125 @@
+{
+  "best_models": {
+    "DecisionTree": {
+      "config_name": "Level2",
+      "params": {
+        "max_depth": 5,
+        "random_state": 42
+      },
+      "test_score": 0.6999651384553718,
+      "test_f1": 0.7339971550497866,
+      "test_auroc": 0.6659331218609569
+    },
+    "NeuralNetwork": {
+      "config_name": "Level4",
+      "params": {
+        "layers": [
+          512,
+          256,
+          128,
+          64
+        ],
+        "epochs": 200,
+        "random_state": 42
+      },
+      "test_score": 0.6831578090037274,
+      "test_f1": 0.7081593927893738,
+      "test_auroc": 0.6581562252180808
+    },
+    "RandomForest": {
+      "config_name": "Level4",
+      "params": {
+        "n_estimators": 200,
+        "max_depth": 15,
+        "random_state": 42
+      },
+      "test_score": 0.7305872092068143,
+      "test_f1": 0.7613559322033898,
+      "test_auroc": 0.6998184862102388
+    },
+    "XGBoost": {
+      "config_name": "Level-3",
+      "params": {
+        "n_estimators": 20,
+        "max_depth": 3,
+        "learning_rate": 0.1,
+        "random_state": 42
+      },
+      "test_score": 0.7412661350259631,
+      "test_f1": 0.7690244720080456,
+      "test_auroc": 0.7135077980438806
+    },
+    "LightGBM": {
+      "config_name": "Level-2",
+      "params": {
+        "n_estimators": 30,
+        "max_depth": 3,
+        "learning_rate": 0.1,
+        "num_leaves": 15,
+        "random_state": 42
+      },
+      "test_score": 0.7404987556189659,
+      "test_f1": 0.7666552784420909,
+      "test_auroc": 0.7143422327958411
+    },
+    "CatBoost": {
+      "config_name": "Level-1",
+      "params": {
+        "iterations": 40,
+        "depth": 4,
+        "learning_rate": 0.1,
+        "l2_leaf_reg": 2.0,
+        "random_state": 42
+      },
+      "test_score": 0.7371681095923648,
+      "test_f1": 0.7596741344195519,
+      "test_auroc": 0.7146620847651776
+    }
+  },
+  "individual_results": {
+    "DecisionTree": {
+      "f1": 0.7339971550497866,
+      "auroc": 0.6659331218609569,
+      "score": 0.6999651384553718
+    },
+    "NeuralNetwork": {
+      "f1": 0.6963746223564955,
+      "auroc": 0.6543968631597497,
+      "score": 0.6753857427581226
+    },
+    "RandomForest": {
+      "f1": 0.7613559322033898,
+      "auroc": 0.6998184862102388,
+      "score": 0.7305872092068143
+    },
+    "XGBoost": {
+      "f1": 0.7690244720080456,
+      "auroc": 0.7135077980438806,
+      "score": 0.7412661350259631
+    },
+    "LightGBM": {
+      "f1": 0.7666552784420909,
+      "auroc": 0.7143422327958411,
+      "score": 0.7404987556189659
+    },
+    "CatBoost": {
+      "f1": 0.7596741344195519,
+      "auroc": 0.7146620847651776,
+      "score": 0.7371681095923648
+    }
+  },
+  "ensemble_result": {
+    "f1": 0.7554157931516422,
+    "auroc": 0.70428143448762,
+    "score": 0.7298486138196312
+  },
+  "ensemble_method": "weighted_average",
+  "weights": {
+    "DecisionTree": 0.1564517450238443,
+    "NeuralNetwork": 0.14902861461864444,
+    "RandomForest": 0.1704400760212445,
+    "XGBoost": 0.17545910495010766,
+    "LightGBM": 0.1750960126568312,
+    "CatBoost": 0.17352444672932787
+  }
+}

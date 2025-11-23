@@ -1,0 +1,69 @@
+{
+  "best_models": {
+    "RandomForest": {
+      "config_name": "Level4",
+      "params": {
+        "n_estimators": 200,
+        "max_depth": 15
+      },
+      "test_score": 0.7305872092068143,
+      "test_f1": 0.7613559322033898,
+      "test_auroc": 0.6998184862102388,
+      "model_type_actual": "RandomForest"
+    },
+    "XGBoost": {
+      "config_name": "Level-3",
+      "params": {
+        "n_estimators": 20,
+        "max_depth": 3,
+        "learning_rate": 0.1
+      },
+      "test_score": 0.7412661350259631,
+      "test_f1": 0.7690244720080456,
+      "test_auroc": 0.7135077980438806,
+      "model_type_actual": "XGBoost"
+    },
+    "LightGBM": {
+      "config_name": "Level-2",
+      "params": {
+        "n_estimators": 30,
+        "max_depth": 3,
+        "learning_rate": 0.1,
+        "num_leaves": 15,
+        "random_state": 42
+      },
+      "test_score": 0.7380040927914073,
+      "test_f1": 0.7646662171274443,
+      "test_auroc": 0.7113419684553705,
+      "model_type_actual": "LightGBM"
+    }
+  },
+  "individual_results": {
+    "RandomForest": {
+      "f1": 0.7611990569215223,
+      "auroc": 0.6976367961934973,
+      "score": 0.7294179265575098
+    },
+    "XGBoost": {
+      "f1": 0.7700463883366467,
+      "auroc": 0.7120415895673627,
+      "score": 0.7410439889520047
+    },
+    "LightGBM": {
+      "f1": 0.7646662171274443,
+      "auroc": 0.7113419684553705,
+      "score": 0.7380040927914073
+    }
+  },
+  "ensemble_result": {
+    "f1": 0.7659859390693003,
+    "auroc": 0.7131720856463124,
+    "score": 0.7395790123578063
+  },
+  "ensemble_method": "weighted_average",
+  "weights": {
+    "RandomForest": 0.32788450189069707,
+    "XGBoost": 0.3375398707378113,
+    "LightGBM": 0.3345756273714916
+  }
+}

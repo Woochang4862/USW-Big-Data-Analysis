@@ -1,0 +1,68 @@
+{
+  "best_models": {
+    "LogisticRegression": {
+      "config_name": "Level8",
+      "params": {
+        "C": 0.01
+      },
+      "test_score": 0.7345925807693228,
+      "test_f1": 0.7527414220021224,
+      "test_auroc": 0.7164437395365231,
+      "model_type_actual": "LogisticRegression"
+    },
+    "XGBoost": {
+      "config_name": "Level-3",
+      "params": {
+        "n_estimators": 20,
+        "max_depth": 3,
+        "learning_rate": 0.1
+      },
+      "test_score": 0.7412661350259631,
+      "test_f1": 0.7690244720080456,
+      "test_auroc": 0.7135077980438806,
+      "model_type_actual": "XGBoost"
+    },
+    "LightGBM": {
+      "config_name": "Level-2",
+      "params": {
+        "n_estimators": 30,
+        "max_depth": 3,
+        "learning_rate": 0.1,
+        "num_leaves": 15,
+        "random_state": 42
+      },
+      "test_score": 0.7380040927914073,
+      "test_f1": 0.7646662171274443,
+      "test_auroc": 0.7113419684553705,
+      "model_type_actual": "LightGBM"
+    }
+  },
+  "individual_results": {
+    "LogisticRegression": {
+      "f1": 0.7543614794138171,
+      "auroc": 0.7154674420653802,
+      "score": 0.7349144607395987
+    },
+    "XGBoost": {
+      "f1": 0.7700463883366467,
+      "auroc": 0.7120415895673627,
+      "score": 0.7410439889520047
+    },
+    "LightGBM": {
+      "f1": 0.7646662171274443,
+      "auroc": 0.7113419684553705,
+      "score": 0.7380040927914073
+    }
+  },
+  "ensemble_result": {
+    "f1": 0.7674104124408384,
+    "auroc": 0.721511146356507,
+    "score": 0.7444607793986727
+  },
+  "ensemble_method": "weighted_average",
+  "weights": {
+    "LogisticRegression": 0.3302988037269974,
+    "XGBoost": 0.33632739589972277,
+    "LightGBM": 0.3333738003732798
+  }
+}
